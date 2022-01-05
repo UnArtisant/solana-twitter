@@ -11,10 +11,12 @@
     "@project-serum/anchor": "^0.19.1-beta.1",
     "@solana/web3.js": "^1.31.0",
     "autoprefixer": "^10.4.1",
+    "axios": "^0.24.0",
     "next": "12.0.7",
     "postcss": "^8.4.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-textarea-autosize": "^8.3.3",
     "tailwindcss": "^3.0.9"
   },
   "devDependencies": {
