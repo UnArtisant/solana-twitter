@@ -1,9 +1,13 @@
 import {fetchApi} from "../utils/api/fetch";
 import TweetForm from "../components/TweetForm";
+import Tweets from "../sections/Tweets";
 
 function Home({tweets}) {
     return (
-        <TweetForm />
+        <div>
+            <TweetForm />
+            <Tweets tweets={tweets} />
+        </div>
     )
 }
 
