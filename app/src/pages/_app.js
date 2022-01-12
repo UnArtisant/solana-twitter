@@ -6,7 +6,11 @@ import {WalletProvider, ConnectionProvider} from '@solana/wallet-adapter-react';
 import {PhantomWalletAdapter, SolflareWalletAdapter} from "@solana/wallet-adapter-wallets";
 import {WalletAdapterNetwork} from "@solana/wallet-adapter-base";
 import {clusterApiUrl} from "@solana/web3.js";
-import dynamic from "next/dynamic";
+import dayjs from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(localizedFormat)
+dayjs.extend(relativeTime)
 
 function MyApp({Component, pageProps}) {
 
@@ -26,9 +30,9 @@ function MyApp({Component, pageProps}) {
 
     return <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
-            <Layout>
-                <Component {...pageProps} />
-            </Layout>
+                <Layout>
+                    <Component {...pageProps} />
+                </Layout>
         </WalletProvider>
     </ConnectionProvider>
 }

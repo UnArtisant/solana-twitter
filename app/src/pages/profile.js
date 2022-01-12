@@ -1,26 +1,36 @@
 import TweetForm from "../components/TweetForm";
 import Tweets from "../sections/Tweets";
-import {fetchApi} from "../utils/api/fetch";
+import {useWorkspace} from "../hook/useWorkspace";
+import {fetchTweet} from "../utils/api/fetch/tweet";
+import {useState, useEffect} from "react";
 
-function Profile({tweets}) {
+function Profile() {
+
+    const {program, wallet} = useWorkspace()
+
+    const [loading, setLoading] = useState(false)
+    const [tweets, setTweets] = useState([])
+
+    const handleTweet = async (program) => {
+        setLoading(true)
+        setTweets(await fetchTweet(program))
+        setLoading(false)
+    }
+
+    useEffect(() => {
+        handleTweet(program)
+    }, [])
+
     return (
         <div>
             <div className="border-b px-8 py-4 bg-gray-50">
-                B1AfN7AgpMyctfFbjmvRAvE1yziZFDb9XCwydBjJwtRN
+                {wallet?.publicKey?.toBase58()}
             </div>
-            <TweetForm />
-            <Tweets tweets={tweets} />
+            <TweetForm/>
+            <Tweets tweets={tweets}/>
         </div>
     )
 }
 
-export async function getServerSideProps() {
-    const tweets = await fetchApi("http://localhost:3000/api/tweets")
-    return {
-        props: {
-            tweets
-        }
-    }
-}
 
 export default Profile

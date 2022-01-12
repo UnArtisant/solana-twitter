@@ -1,11 +1,16 @@
-import {useState} from "react";
+import { useState} from "react";
 import TextareaAutosize from 'react-textarea-autosize';
 import {useCountCharacterLimit} from "../hook/useCountCharacterLimit";
-import {postApi} from "../utils/api/post";
+import {useWallet} from "@solana/wallet-adapter-react";
+import { web3 } from '@project-serum/anchor'
+import {useWorkspace} from "../hook/useWorkspace";
 
 function TweetForm({forcedTopic = ""}) {
 
     const MAX_LENGTH = 280
+
+    const {connected} = useWallet()
+    const {program, wallet} = useWorkspace()
 
     const [topic, setTopic] = useState(forcedTopic)
     const [content, setContent] = useState("")
@@ -21,7 +26,24 @@ function TweetForm({forcedTopic = ""}) {
     const handleSend = async (e) => {
         e.preventDefault()
         if(!canTweet) return;
-        const tweet = await postApi("http://localhost:3000/api/tweets", {topic})
+        console.log("hey")
+        const tweet = web3.Keypair.generate()
+
+        // 3. Send a "SendTweet" instruction with the right data and the right accounts.
+        await program.value.rpc.sendTweet(topic, content, {
+            accounts: {
+                author: wallet.value.publicKey,
+                tweet: tweet.publicKey,
+                systemProgram: web3.SystemProgram.programId,
+            },
+            signers: [tweet]
+        })
+    }
+
+    if(!connected) {
+        return <div className="px-8 py-4 bg-gray-50 text-gray-500 text-center border-b">
+            Connect your wallet to start tweeting...
+        </div>
     }
 
     return <div className="px-8 py-4 border-b">
@@ -55,9 +77,8 @@ function TweetForm({forcedTopic = ""}) {
                 {characterLimit} left
             </div>
             <button
-                disabled={canTweet}
                 onClick={handleSend}
-                className={`text-white px-4 py-2 rounded-full font-semibold ${canTweet ? 'bg-pink-500' : 'bg-pink-300 cursor-not-allowed'}`}>
+                className={`text-white cursor-pointer px-4 py-2 rounded-full font-semibold ${canTweet ? 'bg-pink-500' : 'bg-pink-300 cursor-not-allowed'}`}>
                 Tweet
             </button>
         </div>

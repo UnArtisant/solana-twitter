@@ -1,12 +1,30 @@
 import TweetSearch from "../../components/TweetSearch";
-import {fetchApi} from "../../utils/api/fetch";
 import Tweets from "../../sections/Tweets";
 import {useRouter} from "next/router";
 import TweetForm from "../../components/TweetForm";
+import {useWorkspace} from "../../hook/useWorkspace";
+import {fetchTweet} from "../../utils/api/fetch/tweet";
+import {useState, useEffect} from "react";
+import {topicFilter} from "../../utils/filter/topics";
 
-function Topics ({tweets}) {
+function Topics () {
     const router = useRouter()
+    const {program} = useWorkspace()
+
     const {query} = router
+
+    const [loading, setLoading] = useState(false)
+    const [tweets, setTweets] = useState([])
+
+    const handleTweet = async (program) => {
+        setLoading(true)
+        setTweets(await fetchTweet(program, [topicFilter(query?.topic?.[0])]))
+        setLoading(false)
+    }
+
+    useEffect(() => {
+        handleTweet(program)
+    }, [])
     return <>
      <TweetSearch modelValue={query?.topic?.[0]} placeholder="topic" >
          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -22,13 +40,5 @@ function Topics ({tweets}) {
     </>
 }
 
-export async function getServerSideProps ({query}) {
-    const tweets = await fetchApi("http://localhost:3000/api/tweets")
-    return {
-        props: {
-            tweets : !query ? [] : tweets
-        }
-    }
-}
 
 export default Topics
